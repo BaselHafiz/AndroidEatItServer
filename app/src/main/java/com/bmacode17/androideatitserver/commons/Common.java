@@ -24,6 +24,7 @@ public class Common {
     public static final String DELETE = "Delete";
     public static final String baseUrl = "https://maps.googleapis.com";
     public static final String fcmUrl = "https://fcm.googleapis.com";
+    public static final String PHONE_TEXT = "userPhone";
 
     public static String convertStatusToCode(String status) {
 
