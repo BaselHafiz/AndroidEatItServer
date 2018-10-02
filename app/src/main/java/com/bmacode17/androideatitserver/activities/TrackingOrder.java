@@ -129,7 +129,7 @@ public class TrackingOrder extends FragmentActivity implements OnMapReadyCallbac
                         currentLocationMarker.remove();
                     }
 
-                    LatLng yourLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                    LatLng yourLocation = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.position(yourLocation);
                     markerOptions.title("Current Position");
@@ -145,7 +145,7 @@ public class TrackingOrder extends FragmentActivity implements OnMapReadyCallbac
         };
     }
 
-    private void drawRoute(final LatLng yourLocation, String address) {
+    private void drawRoute(final LatLng yourLocation, final String address) {
 
         mService.getGeoCode(address).enqueue(new Callback<String>() {
             @Override
@@ -172,7 +172,7 @@ public class TrackingOrder extends FragmentActivity implements OnMapReadyCallbac
                             .title("Order of " + Common.currentRequest.getPhone())
                             .position(orderLocation);
                     mMap.addMarker(marker);
-
+/*
                     // Draw route
                     mService.getDirections(yourLocation.latitude+","+yourLocation.longitude,
                             orderLocation.latitude+","+orderLocation.longitude)
@@ -180,7 +180,7 @@ public class TrackingOrder extends FragmentActivity implements OnMapReadyCallbac
                                 @Override
                                 public void onResponse(Call<String> call, Response<String> response) {
 
-                                    new ParserTask().execute(response.body().toString());
+                                   new ParserTask().execute(response.body().toString());
                                 }
 
                                 @Override
@@ -188,7 +188,7 @@ public class TrackingOrder extends FragmentActivity implements OnMapReadyCallbac
 
                                 }
                             });
-
+*/
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
