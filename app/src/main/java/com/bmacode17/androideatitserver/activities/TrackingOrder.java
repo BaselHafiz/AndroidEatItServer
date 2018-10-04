@@ -152,45 +152,50 @@ public class TrackingOrder extends FragmentActivity implements OnMapReadyCallbac
             public void onResponse(Call<String> call, Response<String> response) {
 
                 try {
+
                     JSONObject jsonObject = new JSONObject(response.body().toString());
-                    String lat = ((JSONArray) jsonObject.get("results"))
-                                    .getJSONObject(0)
-                                    .getJSONObject("geometry")
-                                    .getJSONObject("location")
-                                    .get("lat").toString();
 
-                    String lng = ((JSONArray) jsonObject.get("results"))
-                                    .getJSONObject(0)
-                                    .getJSONObject("geometry")
-                                    .getJSONObject("location")
-                                    .get("lng").toString();
+                    if(jsonObject.getJSONArray("results").length() > 0){
 
-                    LatLng orderLocation = new LatLng(Double.parseDouble(lat) , Double.parseDouble(lng));
-                    Bitmap bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.delivery_man);
-                    bitmap = Common.scaleBitmap(bitmap ,200,200);
-                    MarkerOptions marker = new MarkerOptions().icon(BitmapDescriptorFactory.fromBitmap(bitmap))
-                            .title("Order of " + Common.currentRequest.getPhone())
-                            .position(orderLocation);
-                    mMap.addMarker(marker);
-/*
-                    // Draw route
-                    mService.getDirections(yourLocation.latitude+","+yourLocation.longitude,
-                            orderLocation.latitude+","+orderLocation.longitude)
-                            .enqueue(new Callback<String>() {
-                                @Override
-                                public void onResponse(Call<String> call, Response<String> response) {
+                        String lat = jsonObject.getJSONArray("results")
+                                .getJSONObject(0)
+                                .getJSONObject("geometry")
+                                .getJSONObject("location")
+                                .get("lat").toString();
 
-                                   new ParserTask().execute(response.body().toString());
-                                }
+                        String lng = jsonObject.getJSONArray("results")
+                                .getJSONObject(0)
+                                .getJSONObject("geometry")
+                                .getJSONObject("location")
+                                .get("lng").toString();
 
-                                @Override
-                                public void onFailure(Call<String> call, Throwable t) {
+                        LatLng orderLocation = new LatLng(Double.parseDouble(lat) , Double.parseDouble(lng));
+                        Bitmap bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.delivery_man);
+                        bitmap = Common.scaleBitmap(bitmap ,200,200);
+                        MarkerOptions marker = new MarkerOptions().icon(BitmapDescriptorFactory.fromBitmap(bitmap))
+                                .title("Order of " + Common.currentRequest.getPhone())
+                                .position(orderLocation);
+                        mMap.addMarker(marker);
 
-                                }
-                            });
-*/
+                        // Draw route
+                        mService.getDirections(yourLocation.latitude+","+yourLocation.longitude,orderLocation.latitude+","+orderLocation.longitude)
+                                .enqueue(new Callback<String>() {
+                                    @Override
+                                    public void onResponse(Call<String> call, Response<String> response) {
+
+                                        new ParserTask().execute(response.body().toString());
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<String> call, Throwable t) {
+
+                                    }
+                                });
+                    }
+
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    Log.d(TAG, "onResponse: Shit");
                 }
             }
 
@@ -316,7 +321,7 @@ public class TrackingOrder extends FragmentActivity implements OnMapReadyCallbac
 //                        getDeviceLocation();
                     }
                 } else {
-                    Toast.makeText(this, "permission denied", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, "permission denied", Toast.LENGTH_LONG).show();
                 }
                 return;
             }
@@ -344,6 +349,11 @@ public class TrackingOrder extends FragmentActivity implements OnMapReadyCallbac
             List<List<HashMap<String, String>>> routes = null;
 
             try {
+
+                try {
+                    Thread.sleep(2000);
+                } catch (Exception e){}
+
                 jsonObject = new JSONObject(strings[0]);
                 DirectionJsonParser parser = new DirectionJsonParser();
                 routes = parser.parse(jsonObject);
@@ -383,7 +393,8 @@ public class TrackingOrder extends FragmentActivity implements OnMapReadyCallbac
                 polylineOptions.geodesic(true);
             }
 
-            mMap.addPolyline(polylineOptions);
+            if(polylineOptions != null)
+                mMap.addPolyline(polylineOptions);
         }
     }
 
