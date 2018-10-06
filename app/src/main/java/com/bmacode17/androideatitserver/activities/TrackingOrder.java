@@ -73,7 +73,6 @@ public class TrackingOrder extends FragmentActivity implements OnMapReadyCallbac
     private LocationRequest locationRequest;
     private Location lastLocation;
     private Marker currentLocationMarker;
-
     private GeoCoordinates mService;
 
     @Override
@@ -98,7 +97,6 @@ public class TrackingOrder extends FragmentActivity implements OnMapReadyCallbac
                 createLocationRequest();
                 createLocationCallback();
                 mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
-//                getDeviceLocation();
             }
         } else
             checkLocationPermission();
@@ -153,6 +151,7 @@ public class TrackingOrder extends FragmentActivity implements OnMapReadyCallbac
 
                 try {
 
+                    Log.d(TAG, "onResponse: " + response.body().toString());
                     JSONObject jsonObject = new JSONObject(response.body().toString());
 
                     if(jsonObject.getJSONArray("results").length() > 0){
@@ -225,7 +224,6 @@ public class TrackingOrder extends FragmentActivity implements OnMapReadyCallbac
             if (GoogleApiAvailability.getInstance().isUserResolvableError(resultCode)) {
 
                 GoogleApiAvailability.getInstance().getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST).show();
-                ;
 
             } else {
 
@@ -235,41 +233,6 @@ public class TrackingOrder extends FragmentActivity implements OnMapReadyCallbac
             return false;
         }
         return true;
-    }
-
-    private void getDeviceLocation() {
-
-        try {
-            @SuppressLint("MissingPermission")
-            Task location = mFusedLocationClient.getLastLocation();
-            location.addOnCompleteListener(new OnCompleteListener() {
-                @Override
-                public void onComplete(@NonNull Task task) {
-                    if (task.isSuccessful() && task.getResult() != null) {
-
-                        Log.d(TAG, "onComplete: Location is found !");
-                        Location currentLocation = (Location) task.getResult();
-                        Log.d(TAG, "onComplete: Location: " + currentLocation.getLatitude() + " " + currentLocation.getLongitude());
-                        LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-                        setUserMarker(latLng);
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
-                    } else {
-                        Log.d(TAG, "onComplete : current location is null! ");
-                        Toast.makeText(TrackingOrder.this, "Unable to get current location !", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
-        } catch (SecurityException ex) {
-            Log.d(TAG, "GetDeviceLocation : SecurityException: " + ex.getMessage());
-        }
-    }
-
-    public void setUserMarker(LatLng latLng) {
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(latLng);
-        markerOptions.title("Current Position");
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-        mMap.addMarker(markerOptions);
     }
 
     private void checkLocationPermission() {
@@ -306,7 +269,7 @@ public class TrackingOrder extends FragmentActivity implements OnMapReadyCallbac
             }
     }
 
-    @SuppressLint({"MissingPermission", "RestrictedApi"})
+    @SuppressLint("MissingPermission")
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
@@ -318,7 +281,6 @@ public class TrackingOrder extends FragmentActivity implements OnMapReadyCallbac
                         createLocationRequest();
                         createLocationCallback();
                         mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
-//                        getDeviceLocation();
                     }
                 } else {
                         Toast.makeText(this, "permission denied", Toast.LENGTH_LONG).show();
@@ -351,7 +313,7 @@ public class TrackingOrder extends FragmentActivity implements OnMapReadyCallbac
             try {
 
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(5000);
                 } catch (Exception e){}
 
                 jsonObject = new JSONObject(strings[0]);
