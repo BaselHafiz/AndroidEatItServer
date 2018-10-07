@@ -12,25 +12,36 @@ public class Order {
     private String quantity;
     private String price;
     private String discount;
+    private String image;
 
     public Order() {
     }
 
-    public Order(int id, String productId, String productName, String quantity, String price, String discount) {
+    public Order(int id, String productId, String productName, String quantity, String price, String discount, String image) {
         this.id = id;
         this.productId = productId;
         this.productName = productName;
         this.quantity = quantity;
         this.price = price;
         this.discount = discount;
+        this.image = image;
     }
 
-    public Order(String productId, String productName, String quantity, String price, String discount) {
+    public Order(String productId, String productName, String quantity, String price, String discount, String image) {
         this.productId = productId;
         this.productName = productName;
         this.quantity = quantity;
         this.price = price;
         this.discount = discount;
+        this.image = image;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public int getId() {
