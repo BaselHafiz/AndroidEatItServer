@@ -10,6 +10,7 @@ public class User {
     private String password;
     private String phone;
     private String isStaff;
+    private String homeAddress;
 
     public User() {
     }
@@ -17,6 +18,14 @@ public class User {
     public User(String name, String password) {
         this.name = name;
         this.password = password;
+    }
+
+    public String getHomeAddress() {
+        return homeAddress;
+    }
+
+    public void setHomeAddress(String homeAddress) {
+        this.homeAddress = homeAddress;
     }
 
     public String getIsStaff() {
