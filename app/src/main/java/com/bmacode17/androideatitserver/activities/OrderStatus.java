@@ -2,6 +2,7 @@ package com.bmacode17.androideatitserver.activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.bmacode17.androideatitserver.R;
@@ -24,8 +26,10 @@ import com.bmacode17.androideatitserver.models.Request;
 import com.bmacode17.androideatitserver.models.Sender;
 import com.bmacode17.androideatitserver.models.Token;
 import com.bmacode17.androideatitserver.remote.APIService;
+import com.bmacode17.androideatitserver.viewHolders.FoodViewHolder;
 import com.bmacode17.androideatitserver.viewHolders.OrderViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -74,10 +78,16 @@ public class OrderStatus extends AppCompatActivity {
 
     private void loadOrders() {
 
-        adapter = new FirebaseRecyclerAdapter<Request, OrderViewHolder>(Request.class, R.layout.cardview_order,
-                OrderViewHolder.class, table_request.orderByChild("phone")) {
+        // Create query by phone
+        Query query = table_request.orderByChild("phone");
+
+        FirebaseRecyclerOptions<Request> options = new FirebaseRecyclerOptions.Builder<Request>()
+                .setQuery(query,Request.class)
+                .build();
+
+        adapter = new FirebaseRecyclerAdapter<Request, OrderViewHolder>(options) {
             @Override
-            protected void populateViewHolder(OrderViewHolder viewHolder, final Request model, final int position) {
+            protected void onBindViewHolder(@NonNull OrderViewHolder viewHolder, final int position, @NonNull final Request model) {
 
                 viewHolder.textView_orderId.setText(adapter.getRef(position).getKey());
                 viewHolder.textView_orderStatus.setText(Common.convertStatusToCode(model.getStatus()));
@@ -125,7 +135,17 @@ public class OrderStatus extends AppCompatActivity {
                     }
                 });
             }
+
+            @Override
+            public OrderViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
+                View itemView = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.cardview_order,parent,false);
+                return new OrderViewHolder(itemView);
+            }
         };
+
+        adapter.startListening();
         adapter.notifyDataSetChanged();
         recyclerView_listOrder.setAdapter(adapter);
     }
@@ -214,5 +234,20 @@ public class OrderStatus extends AppCompatActivity {
         table_request.child(key).removeValue();
         adapter.notifyDataSetChanged();
         Toast.makeText(this, "Order is deleted ! ", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if(adapter != null)
+            adapter.stopListening();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        loadOrders();
     }
 }

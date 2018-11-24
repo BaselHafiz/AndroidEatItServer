@@ -21,6 +21,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -31,9 +32,12 @@ import com.bmacode17.androideatitserver.commons.Common;
 import com.bmacode17.androideatitserver.interfaces.ItemClickListener;
 import com.bmacode17.androideatitserver.models.Category;
 
+import com.bmacode17.androideatitserver.models.Food;
 import com.bmacode17.androideatitserver.models.Token;
+import com.bmacode17.androideatitserver.viewHolders.FoodViewHolder;
 import com.bmacode17.androideatitserver.viewHolders.MenuViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -247,16 +251,18 @@ public class Home extends AppCompatActivity
 
     private void loadMenu() {
 
-        adapter = new FirebaseRecyclerAdapter<Category, MenuViewHolder>(Category.class, R.layout.cardview_menu_item,
-                MenuViewHolder.class, table_category) {
+        FirebaseRecyclerOptions<Category> options = new FirebaseRecyclerOptions.Builder<Category>()
+                .setQuery(table_category,Category.class)
+                .build();
+
+        adapter = new FirebaseRecyclerAdapter<Category, MenuViewHolder>(options) {
             @Override
-            protected void populateViewHolder(MenuViewHolder viewHolder, Category model, int position) {
+            protected void onBindViewHolder(@NonNull MenuViewHolder holder, int position, @NonNull Category model) {
 
-                viewHolder.textView_menuName.setText(model.getName());
-                Picasso.with(getBaseContext()).load(model.getImage()).into(viewHolder.imageView_menuImage);
+                holder.textView_menuName.setText(model.getName());
+                Picasso.with(getBaseContext()).load(model.getImage()).into(holder.imageView_menuImage);
                 final Category clickedItem = model;
-
-                viewHolder.setItemClickListener(new ItemClickListener() {
+                holder.setItemClickListener(new ItemClickListener() {
                     @Override
                     public void onClick(View view, int position, boolean isLongClick) {
 
@@ -268,8 +274,17 @@ public class Home extends AppCompatActivity
                     }
                 });
             }
+
+            @Override
+            public MenuViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
+                View itemView = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.cardview_menu_item,parent,false);
+                return new MenuViewHolder(itemView);
+            }
         };
 
+        adapter.startListening();
         adapter.notifyDataSetChanged();
         recyclerView_menu.setAdapter(adapter);
     }
@@ -481,5 +496,20 @@ public class Home extends AppCompatActivity
                         }
                     });
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if(adapter != null)
+            adapter.stopListening();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        loadMenu();
     }
 }

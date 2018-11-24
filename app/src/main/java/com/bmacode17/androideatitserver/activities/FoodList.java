@@ -14,6 +14,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -25,10 +26,12 @@ import com.bmacode17.androideatitserver.models.Category;
 import com.bmacode17.androideatitserver.models.Food;
 import com.bmacode17.androideatitserver.viewHolders.FoodViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -100,23 +103,39 @@ public class FoodList extends AppCompatActivity {
 
     private void loadFoodList(String categoryId) {
 
-        adapter = new FirebaseRecyclerAdapter<Food, FoodViewHolder>(Food.class, R.layout.cardview_food_list,
-                FoodViewHolder.class, table_food.orderByChild("menuId").equalTo(categoryId)) { // like select * from foods where MenuId = categoryId
-            @Override
-            protected void populateViewHolder(FoodViewHolder viewHolder, Food model, int position) {
+        // Create query by categoryId
+        Query query = table_food.orderByChild("menuId").equalTo(categoryId);  // like select * from foods where MenuId = categoryId
 
-                viewHolder.textView_foodName.setText(model.getName());
-                Picasso.with(getBaseContext()).load(model.getImage()).into(viewHolder.imageView_foodImage);
+        FirebaseRecyclerOptions<Food> options = new FirebaseRecyclerOptions.Builder<Food>()
+                .setQuery(query,Food.class)
+                .build();
+
+        adapter = new FirebaseRecyclerAdapter<Food, FoodViewHolder>(options) {
+            @Override
+            protected void onBindViewHolder(@NonNull FoodViewHolder holder, int position, @NonNull Food model) {
+
+                holder.textView_foodName.setText(model.getName());
+                Picasso.with(getBaseContext()).load(model.getImage()).into(holder.imageView_foodImage);
                 final Food clickedItem = model;
-                viewHolder.setItemClickListener(new ItemClickListener() {
+
+                holder.setItemClickListener(new ItemClickListener() {
                     @Override
                     public void onClick(View view, int position, boolean isLongClick) {
 
                     }
                 });
             }
+
+            @Override
+            public FoodViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
+                View itemView = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.cardview_food_list,parent,false);
+                return new FoodViewHolder(itemView);
+            }
         };
 
+        adapter.startListening();
         adapter.notifyDataSetChanged();
         recyclerView_foodList.setAdapter(adapter);
         // pc_0 - Using an unspecified index.
@@ -381,5 +400,13 @@ public class FoodList extends AppCompatActivity {
 
         table_food.child(key).removeValue();
         Toast.makeText(this, "Food is deleted ! ", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if(adapter != null)
+            adapter.stopListening();
     }
 }
