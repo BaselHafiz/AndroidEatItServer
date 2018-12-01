@@ -196,6 +196,7 @@ public class FoodList extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
+                newFood = null;
             }
         });
 

@@ -11,6 +11,12 @@
             android:title="Menu" />
 
         <item
+            android:id="@+id/nav_banner"
+            android:icon="@drawable/ic_laptop_mac_black_24dp"
+            android:iconTint="@android:color/white"
+            android:title="Banner" />
+
+        <item
             android:id="@+id/nav_cart"
             android:icon="@drawable/ic_shopping_cart_black_24dp"
             android:iconTint="@android:color/white"

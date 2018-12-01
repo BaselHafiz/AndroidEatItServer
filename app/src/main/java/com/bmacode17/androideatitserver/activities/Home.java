@@ -327,23 +327,15 @@ public class Home extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_menu) {
-
-        } else if (id == R.id.nav_cart) {
-
-            //Intent cartIntent = new Intent(Home.this , Cart.class);
-            //startActivity(cartIntent);
-
-        } else if (id == R.id.nav_orders) {
+        if (id == R.id.nav_orders) {
 
             Intent orderStatusIntent = new Intent(Home.this , OrderStatus.class);
             startActivity(orderStatusIntent);
 
-        } else if (id == R.id.nav_logout) {
+        } else if (id == R.id.nav_banner) {
 
-            //Intent signInIntent = new Intent(Home.this , SignIn.class);
-            //signInIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            //startActivity(signInIntent);
+            Intent bannerIntent = new Intent(Home.this , BannerActivity.class);
+            startActivity(bannerIntent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
